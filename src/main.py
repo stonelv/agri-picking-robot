@@ -24,9 +24,14 @@ def main():
             # Process frame and get movement coordinates
             movement_coordinates = model_interface.analyze_frame(frame)
 
-            # Move the robotic arm and base vehicle
+            # Move the robotic arm to the target position
             arm_controller.move_to(movement_coordinates['arm'])
-            base_controller.move_to(movement_coordinates['base'])
+            # Perform pick operation
+            arm_controller.pick()
+            # reset the arm to the initial position
+            arm_controller.calibrate()
+            # Move the base vehicle forward
+            base_controller.move_forward()
 
             # Sleep to control the loop rate
             time.sleep(0.1)
