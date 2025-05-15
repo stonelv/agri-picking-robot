@@ -1,0 +1,8 @@
+opencv-python
+numpy
+tensorflow
+scikit-learn
+pyserial
+matplotlib
+pillow
+requests
