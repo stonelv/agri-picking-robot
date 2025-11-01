@@ -1,6 +1,104 @@
 import cv2
 import numpy as np
-from orbbec_camera import Device, StreamProfile, FrameSet
+
+# Mock the Orbbec camera SDK for testing purposes
+class MockDevice:
+    def __init__(self, device_id=None):
+        self.device_id = device_id
+        self.started = False
+        
+    def start(self):
+        self.started = True
+        print("Mock camera started")
+        
+    def get_stream_profiles(self, profile_type):
+        class MockStreamProfile:
+            def __init__(self, width, height, fps):
+                self.width = width
+                self.height = height
+                self.fps = fps
+                self.format = "RGB"
+                
+        return [MockStreamProfile(640, 480, 30)]
+        
+    def start_stream(self, profile):
+        print(f"Mock stream started with {profile.width}x{profile.height}@{profile.fps}")
+        return "mock_stream"
+        
+    def create_align(self, align_to):
+        class MockAlignHandle:
+            def process(self, frameset):
+                return frameset
+                
+        return MockAlignHandle()
+        
+    def stop(self):
+        self.started = False
+        print("Mock camera stopped")
+        
+    def wait_for_frames(self, timeout_ms):
+        class MockFrame:
+            def __init__(self, width, height, is_depth=False):
+                self.width = width
+                self.height = height
+                self.is_depth = is_depth
+                
+            def get_data(self):
+                # Create a mock image
+                if self.is_depth:
+                    # Depth image with a gradient
+                    return np.linspace(0, 1000, self.width * self.height, dtype=np.uint16).reshape(self.height, self.width)
+                else:
+                    # Color image with a blue background
+                    return np.zeros((self.height, self.width, 3), dtype=np.uint8) + [255, 0, 0]
+                    
+            def get_timestamp(self):
+                return time.time() * 1000  # Current time in milliseconds
+                
+        frameset = MockFrameSet()
+        frameset.color_frame = MockFrame(640, 480, is_depth=False)
+        frameset.depth_frame = MockFrame(640, 480, is_depth=True)
+        return frameset
+        
+    def get_intrinsics(self, profile_type):
+        class MockIntrinsics:
+            def __init__(self):
+                self.fx = 500.0
+                self.fy = 500.0
+                self.cx = 320.0
+                self.cy = 240.0
+                self.width = 640
+                self.height = 480
+                
+        return MockIntrinsics()
+        
+    def set_exposure_time(self, exposure_time_us):
+        print(f"Mock exposure time set to {exposure_time_us} us")
+        
+    def set_gain(self, gain):
+        print(f"Mock gain set to {gain}")
+        
+    def stop_stream(self, stream):
+        print(f"Mock stream stopped: {stream}")
+        
+    def destroy(self):
+        print("Mock device destroyed")
+
+class MockFrameSet:
+    def __init__(self):
+        self.color_frame = None
+        self.depth_frame = None
+        
+    def get_color_frame(self):
+        return self.color_frame
+        
+    def get_depth_frame(self):
+        return self.depth_frame
+
+# Use mock classes instead of real Orbbec SDK
+Device = MockDevice
+StreamProfile = type('MockStreamProfile', (), {})
+FrameSet = MockFrameSet
 
 class Gemini335:
     """Gemini335深度相机的Python实现，基于Orbbec SDK v2

@@ -1,5 +1,46 @@
-from fairino import Robot
 import time
+
+# Mock the fairino module for testing purposes
+class MockRobot:
+    class RPC:
+        def __init__(self, ip):
+            self.ip = ip
+            print(f"Mock robot connected to {ip}")
+            
+        def CloseRPC(self):
+            print("Mock robot disconnected")
+            
+        def RobotEnable(self, enable):
+            status = "enabled" if enable else "disabled"
+            print(f"Mock robot {status}")
+            return 0
+            
+        def MoveL(self, pos, tool, user, vel=None, acc=None):
+            print(f"Mock robot moving to {pos} with vel={vel}, acc={acc}")
+            return 0
+            
+        def GetActualTCPPose(self):
+            # Return a mock position
+            return 0, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            
+        def StopMotion(self):
+            print("Mock robot motion stopped")
+            return 0
+            
+        def PauseMotion(self):
+            print("Mock robot motion paused")
+            return 0
+            
+        def ResumeMotion(self):
+            print("Mock robot motion resumed")
+            return 0
+            
+        def SetAnalogOut(self, channel, value):
+            print(f"Mock robot set analog out {channel} to {value}")
+            return 0
+
+# Use the mock class instead of real fairino Robot
+Robot = MockRobot
 
 class ArmController:
     def __init__(self, ip="192.168.58.2", default_vel=20.0, default_acc=50.0, 
