@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from orbbec_camera import Device, StreamProfile, FrameSet
+from pyorbbecsdk import Context, Device, StreamProfile, FrameSet
 
 class Gemini335:
     """Gemini335深度相机的Python实现，基于Orbbec SDK v2
@@ -45,10 +45,24 @@ class Gemini335:
         """
         try:
             # 创建设备实例
+            context = Context()
+            device_list = context.query_devices()
+            if device_list.get_count() < 1:
+                raise Exception("未找到设备，请连接设备后重试。")
+                
             if self.device_id:
-                self.device = Device(self.device_id)
+                # 根据设备ID查找设备
+                for i in range(device_list.get_count()):
+                    device = device_list[i]
+                    device_info = device.get_device_info()
+                    if device_info.get_serial_number() == self.device_id:
+                        self.device = device
+                        break
+                if not self.device:
+                    raise Exception(f"未找到设备ID为 {self.device_id} 的设备。")
             else:
-                self.device = Device()
+                # 使用第一个设备
+                self.device = device_list[0]
             
             # 启动设备
             self.device.start()
