@@ -52,8 +52,11 @@ class RobotSettings:
 class ModelSettings:
     """模型设置类"""
     def __init__(self):
-        self.api_endpoint = "http://localhost:5000/predict"
-        self.timeout = 5  # in seconds
+        # 阿里通义API相关设置
+        self.api_key = "sk-a9406f95ddee4b7fa5f403f8ce0ee96d"  # 请替换为实际的API Key
+        self.api_secret = "your_aliyun_api_secret"  # 请替换为实际的API Secret
+        self.api_endpoint = "https://dashscope.aliyuncs.com/api/v1/services/aigc/image-generation/generation"
+        self.timeout = 10  # in seconds
         
         # 目标检测相关设置
         self.confidence_threshold = 0.7  # 置信度阈值
